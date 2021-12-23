@@ -1,0 +1,36 @@
+bin/*
+pkg/*
+
+*.o
+*.a
+*.so
+
+*.exe
+*.test
+*.prof
+
+/*.iml
+
+## Directory-based project format:
+.idea/
+
+out/
+
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+.apdisk
