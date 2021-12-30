@@ -7,10 +7,13 @@ import (
 )
 
 func SetRoutes(r *gin.Engine) {
+
+	video_controller := &controller.VideoController{ApplicationController: controller.ApplicationController{DB: DBClient, Name: "video"}}
+
 	video := r.Group("/api/video")
-	video.GET("/", controller.VideoList)
-	video.GET("/info/:id", controller.VideoInfo)
-	video.POST("/download", controller.VideoDownload)
-	video.GET("/gen_preview", controller.VideoGenPreview)
-	video.DELETE("/delete/:id", controller.VideoDelete)
+	video.GET("/", video_controller.List)
+	video.GET("/info/:id", video_controller.Info)
+	video.POST("/download", video_controller.Delete)
+	video.GET("/gen_preview", video_controller.GenPreview)
+	video.DELETE("/delete/:id", video_controller.Delete)
 }
