@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"annie-baby/ent"
 	"context"
 
 	"github.com/gin-gonic/gin"
@@ -8,17 +9,17 @@ import (
 )
 
 type VideoController struct {
-	ApplicationController
+	DB *ent.Client
 }
 
 // get
 func (c *VideoController) List(ctx *gin.Context) {
 	query := ctx.DefaultQuery("ass", "kick")
 
-	videos, err := c.ApplicationController.DB.Video.Query().All(context.Background())
+	videos, err := c.DB.Video.Query().All(context.Background())
 
 	if err != nil {
-		pretty.Logf(" err %v", err)
+		pretty.Logf("bind json err %v", err)
 	}
 
 	ctx.JSON(200, gin.H{
@@ -27,13 +28,22 @@ func (c *VideoController) List(ctx *gin.Context) {
 	})
 }
 
-//get
+//POST 只拉info
 func (c *VideoController) Info(ctx *gin.Context) {
-	id := ctx.Param("id")
-	ctx.JSON(200, gin.H{
-		"id": id,
-	})
+	var json VideoInfoRO
+	err := ctx.ShouldBindJSON(&json)
 
+	if err != nil {
+		pretty.Logf("bind json err %v", err)
+		FailJson(ctx, err.Error(), err)
+		return
+	}
+
+	SuccJson(ctx, json)
+}
+
+//GET 获取详情
+func (c *VideoController) Show(ctx *gin.Context) {
 }
 
 type downloadRequest struct {
@@ -41,7 +51,9 @@ type downloadRequest struct {
 	Stream string `form:"stream"`
 }
 
-//post
+//POST 下载,
+// 有ID的时候1.查出 2.有无指定steam再调用默认下载
+// 没有ID的时候直接使用url创建model再下载
 func (c *VideoController) Download(ctx *gin.Context) {
 	form := downloadRequest{}
 	if err := ctx.ShouldBind(&form); err != nil {
@@ -57,7 +69,7 @@ func (c *VideoController) Download(ctx *gin.Context) {
 	})
 }
 
-//get
+// 默认下载完成会生成略缩图, 这个用于生成hls
 func (c *VideoController) GenPreview(ctx *gin.Context) {
 
 }

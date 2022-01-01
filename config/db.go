@@ -26,3 +26,7 @@ func init() {
 
 	DBClient = client
 }
+
+func GetDB() *ent.Client {
+	return DBClient
+}

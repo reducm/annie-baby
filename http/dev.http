@@ -1,0 +1,18 @@
+### list
+GET http://127.0.0.1:3000/api/video
+    ?ass=fuck
+    &page=1
+content-type: application/json
+
+### info
+POST http://127.0.0.1:3000/api/video/info
+content-type: application/json
+
+{
+    "id": 123,
+    "cookie": "shit",
+    "filename": "filename",
+    "extractor_proxy": "127.0.0.1",
+    "output_dir": "/home/jojo/Movies",
+    "cookie": "cookie"
+}
