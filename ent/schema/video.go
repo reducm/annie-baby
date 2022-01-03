@@ -2,6 +2,7 @@ package schema
 
 import (
 	"annie-baby/enum"
+	"github.com/iawia002/annie/extractors/types"
 	"time"
 
 	"entgo.io/ent"
@@ -15,6 +16,7 @@ type Video struct {
 
 // Fields of the Video.
 func (Video) Fields() []ent.Field {
+	enums := enum.VideoEnum.GetEnumsMsgs()
 	return []ent.Field{
 		field.String("link").
 			NotEmpty().
@@ -32,9 +34,9 @@ func (Video) Fields() []ent.Field {
 		field.String("proxy"),
 
 		field.Enum("status").
-			Values(
-				enum.PENDING.String(),
-			),
+			Values(enums...).Default(enum.Pending.Msg),
+
+		field.JSON("streams", map[string]*types.Stream{}).Optional(),
 
 		field.Time("created_at").
 			Default(time.Now),

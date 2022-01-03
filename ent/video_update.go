@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/iawia002/annie/extractors/types"
 )
 
 // VideoUpdate is the builder for updating Video entities.
@@ -60,6 +61,26 @@ func (vu *VideoUpdate) SetProxy(s string) *VideoUpdate {
 // SetStatus sets the "status" field.
 func (vu *VideoUpdate) SetStatus(v video.Status) *VideoUpdate {
 	vu.mutation.SetStatus(v)
+	return vu
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableStatus(v *video.Status) *VideoUpdate {
+	if v != nil {
+		vu.SetStatus(*v)
+	}
+	return vu
+}
+
+// SetStreams sets the "streams" field.
+func (vu *VideoUpdate) SetStreams(m map[string]*types.Stream) *VideoUpdate {
+	vu.mutation.SetStreams(m)
+	return vu
+}
+
+// ClearStreams clears the value of the "streams" field.
+func (vu *VideoUpdate) ClearStreams() *VideoUpdate {
+	vu.mutation.ClearStreams()
 	return vu
 }
 
@@ -242,6 +263,19 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: video.FieldStatus,
 		})
 	}
+	if value, ok := vu.mutation.Streams(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: video.FieldStreams,
+		})
+	}
+	if vu.mutation.StreamsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: video.FieldStreams,
+		})
+	}
 	if value, ok := vu.mutation.CreatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -308,6 +342,26 @@ func (vuo *VideoUpdateOne) SetProxy(s string) *VideoUpdateOne {
 // SetStatus sets the "status" field.
 func (vuo *VideoUpdateOne) SetStatus(v video.Status) *VideoUpdateOne {
 	vuo.mutation.SetStatus(v)
+	return vuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableStatus(v *video.Status) *VideoUpdateOne {
+	if v != nil {
+		vuo.SetStatus(*v)
+	}
+	return vuo
+}
+
+// SetStreams sets the "streams" field.
+func (vuo *VideoUpdateOne) SetStreams(m map[string]*types.Stream) *VideoUpdateOne {
+	vuo.mutation.SetStreams(m)
+	return vuo
+}
+
+// ClearStreams clears the value of the "streams" field.
+func (vuo *VideoUpdateOne) ClearStreams() *VideoUpdateOne {
+	vuo.mutation.ClearStreams()
 	return vuo
 }
 
@@ -512,6 +566,19 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 			Type:   field.TypeEnum,
 			Value:  value,
 			Column: video.FieldStatus,
+		})
+	}
+	if value, ok := vuo.mutation.Streams(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: video.FieldStreams,
+		})
+	}
+	if vuo.mutation.StreamsCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Column: video.FieldStreams,
 		})
 	}
 	if value, ok := vuo.mutation.CreatedAt(); ok {

@@ -2,6 +2,10 @@ package controller
 
 import (
 	"annie-baby/ent"
+	"annie-baby/ent/video"
+	"annie-baby/enum"
+	console "annie-baby/utils"
+	"annie-baby/wrapper"
 	"context"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +16,7 @@ type VideoController struct {
 	DB *ent.Client
 }
 
-// get
+// List get
 func (c *VideoController) List(ctx *gin.Context) {
 	query := ctx.DefaultQuery("ass", "kick")
 
@@ -28,7 +32,7 @@ func (c *VideoController) List(ctx *gin.Context) {
 	})
 }
 
-//POST 只拉info
+// Info POST 只拉info
 func (c *VideoController) Info(ctx *gin.Context) {
 	var json VideoInfoRO
 	err := ctx.ShouldBindJSON(&json)
@@ -39,10 +43,34 @@ func (c *VideoController) Info(ctx *gin.Context) {
 		return
 	}
 
-	SuccJson(ctx, json)
+	// loginfo
+	info, err := wrapper.Info(json.Link, "")
+
+	if err != nil {
+		pretty.Logf(" err %v", err)
+		FailJson(ctx, err.Error(), err)
+		return
+	}
+
+	video, err := c.DB.Video.Create().
+		SetLink(info.URL).
+		SetProxy(json.ExtractorProxy).
+		SetStatus(video.Status(enum.Pending.Msg)).
+		SetStreams(info.Streams).
+		SetType("bilibili").
+		SetOutputDir("shit").
+		SetTitle(info.Title).
+		Save(context.Background())
+
+	if err != nil {
+		console.Logf("保存出错: ", err)
+		FailJson(ctx, err.Error(), err)
+	}
+
+	SuccJson(ctx, video)
 }
 
-//GET 获取详情
+// Show GET 获取详情
 func (c *VideoController) Show(ctx *gin.Context) {
 }
 
@@ -51,7 +79,7 @@ type downloadRequest struct {
 	Stream string `form:"stream"`
 }
 
-//POST 下载,
+// Download POST 下载,
 // 有ID的时候1.查出 2.有无指定steam再调用默认下载
 // 没有ID的时候直接使用url创建model再下载
 func (c *VideoController) Download(ctx *gin.Context) {
@@ -69,12 +97,12 @@ func (c *VideoController) Download(ctx *gin.Context) {
 	})
 }
 
-// 默认下载完成会生成略缩图, 这个用于生成hls
+// GenPreview 默认下载完成会生成略缩图, 这个用于生成hls
 func (c *VideoController) GenPreview(ctx *gin.Context) {
 
 }
 
-//delete
+// Delete delete
 func (c *VideoController) Delete(ctx *gin.Context) {
 
 }

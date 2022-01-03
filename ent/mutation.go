@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/iawia002/annie/extractors/types"
+
 	"entgo.io/ent"
 )
 
@@ -37,6 +39,7 @@ type VideoMutation struct {
 	output_dir    *string
 	proxy         *string
 	status        *video.Status
+	streams       *map[string]*types.Stream
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -340,6 +343,55 @@ func (m *VideoMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetStreams sets the "streams" field.
+func (m *VideoMutation) SetStreams(value map[string]*types.Stream) {
+	m.streams = &value
+}
+
+// Streams returns the value of the "streams" field in the mutation.
+func (m *VideoMutation) Streams() (r map[string]*types.Stream, exists bool) {
+	v := m.streams
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStreams returns the old "streams" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldStreams(ctx context.Context) (v map[string]*types.Stream, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStreams is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStreams requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStreams: %w", err)
+	}
+	return oldValue.Streams, nil
+}
+
+// ClearStreams clears the value of the "streams" field.
+func (m *VideoMutation) ClearStreams() {
+	m.streams = nil
+	m.clearedFields[video.FieldStreams] = struct{}{}
+}
+
+// StreamsCleared returns if the "streams" field was cleared in this mutation.
+func (m *VideoMutation) StreamsCleared() bool {
+	_, ok := m.clearedFields[video.FieldStreams]
+	return ok
+}
+
+// ResetStreams resets all changes to the "streams" field.
+func (m *VideoMutation) ResetStreams() {
+	m.streams = nil
+	delete(m.clearedFields, video.FieldStreams)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *VideoMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -431,7 +483,7 @@ func (m *VideoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VideoMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.link != nil {
 		fields = append(fields, video.FieldLink)
 	}
@@ -449,6 +501,9 @@ func (m *VideoMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, video.FieldStatus)
+	}
+	if m.streams != nil {
+		fields = append(fields, video.FieldStreams)
 	}
 	if m.created_at != nil {
 		fields = append(fields, video.FieldCreatedAt)
@@ -476,6 +531,8 @@ func (m *VideoMutation) Field(name string) (ent.Value, bool) {
 		return m.Proxy()
 	case video.FieldStatus:
 		return m.Status()
+	case video.FieldStreams:
+		return m.Streams()
 	case video.FieldCreatedAt:
 		return m.CreatedAt()
 	case video.FieldUpdatedAt:
@@ -501,6 +558,8 @@ func (m *VideoMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldProxy(ctx)
 	case video.FieldStatus:
 		return m.OldStatus(ctx)
+	case video.FieldStreams:
+		return m.OldStreams(ctx)
 	case video.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case video.FieldUpdatedAt:
@@ -556,6 +615,13 @@ func (m *VideoMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
+	case video.FieldStreams:
+		v, ok := value.(map[string]*types.Stream)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStreams(v)
+		return nil
 	case video.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -599,7 +665,11 @@ func (m *VideoMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *VideoMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(video.FieldStreams) {
+		fields = append(fields, video.FieldStreams)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -612,6 +682,11 @@ func (m *VideoMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *VideoMutation) ClearField(name string) error {
+	switch name {
+	case video.FieldStreams:
+		m.ClearStreams()
+		return nil
+	}
 	return fmt.Errorf("unknown Video nullable field %s", name)
 }
 
@@ -636,6 +711,9 @@ func (m *VideoMutation) ResetField(name string) error {
 		return nil
 	case video.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case video.FieldStreams:
+		m.ResetStreams()
 		return nil
 	case video.FieldCreatedAt:
 		m.ResetCreatedAt()

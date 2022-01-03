@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/iawia002/annie/extractors/types"
 )
 
 // VideoCreate is the builder for creating a Video entity.
@@ -53,6 +54,20 @@ func (vc *VideoCreate) SetProxy(s string) *VideoCreate {
 // SetStatus sets the "status" field.
 func (vc *VideoCreate) SetStatus(v video.Status) *VideoCreate {
 	vc.mutation.SetStatus(v)
+	return vc
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableStatus(v *video.Status) *VideoCreate {
+	if v != nil {
+		vc.SetStatus(*v)
+	}
+	return vc
+}
+
+// SetStreams sets the "streams" field.
+func (vc *VideoCreate) SetStreams(m map[string]*types.Stream) *VideoCreate {
+	vc.mutation.SetStreams(m)
 	return vc
 }
 
@@ -155,6 +170,10 @@ func (vc *VideoCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (vc *VideoCreate) defaults() {
+	if _, ok := vc.mutation.Status(); !ok {
+		v := video.DefaultStatus
+		vc.mutation.SetStatus(v)
+	}
 	if _, ok := vc.mutation.CreatedAt(); !ok {
 		v := video.DefaultCreatedAt()
 		vc.mutation.SetCreatedAt(v)
@@ -285,6 +304,14 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 			Column: video.FieldStatus,
 		})
 		_node.Status = value
+	}
+	if value, ok := vc.mutation.Streams(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeJSON,
+			Value:  value,
+			Column: video.FieldStreams,
+		})
+		_node.Streams = value
 	}
 	if value, ok := vc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

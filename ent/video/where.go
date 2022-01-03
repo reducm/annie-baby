@@ -744,6 +744,20 @@ func StatusNotIn(vs ...Status) predicate.Video {
 	})
 }
 
+// StreamsIsNil applies the IsNil predicate on the "streams" field.
+func StreamsIsNil() predicate.Video {
+	return predicate.Video(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStreams)))
+	})
+}
+
+// StreamsNotNil applies the NotNil predicate on the "streams" field.
+func StreamsNotNil() predicate.Video {
+	return predicate.Video(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStreams)))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {

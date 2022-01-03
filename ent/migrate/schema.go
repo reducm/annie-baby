@@ -16,7 +16,8 @@ var (
 		{Name: "title", Type: field.TypeString},
 		{Name: "output_dir", Type: field.TypeString},
 		{Name: "proxy", Type: field.TypeString},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"PENDING"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"CRAWSUCC", "PENDING", "INFO", "CRAWLING", "CRAWFAIL"}, Default: "PENDING"},
+		{Name: "streams", Type: field.TypeJSON, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

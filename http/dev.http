@@ -14,5 +14,6 @@ content-type: application/json
     "filename": "filename",
     "extractor_proxy": "127.0.0.1",
     "output_dir": "/home/jojo/Movies",
-    "cookie": "cookie"
+    "cookie": "cookie",
+    "link": "https://www.bilibili.com/video/BV1jJ411q7Yf?spm_id_from=333.999.0.0"
 }

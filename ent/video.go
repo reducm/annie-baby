@@ -4,11 +4,13 @@ package ent
 
 import (
 	"annie-baby/ent/video"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/iawia002/annie/extractors/types"
 )
 
 // Video is the model entity for the Video schema.
@@ -28,6 +30,8 @@ type Video struct {
 	Proxy string `json:"proxy,omitempty"`
 	// Status holds the value of the "status" field.
 	Status video.Status `json:"status,omitempty"`
+	// Streams holds the value of the "streams" field.
+	Streams map[string]*types.Stream `json:"streams,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -39,6 +43,8 @@ func (*Video) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case video.FieldStreams:
+			values[i] = new([]byte)
 		case video.FieldID:
 			values[i] = new(sql.NullInt64)
 		case video.FieldLink, video.FieldType, video.FieldTitle, video.FieldOutputDir, video.FieldProxy, video.FieldStatus:
@@ -102,6 +108,14 @@ func (v *Video) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				v.Status = video.Status(value.String)
 			}
+		case video.FieldStreams:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field streams", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &v.Streams); err != nil {
+					return fmt.Errorf("unmarshal field streams: %w", err)
+				}
+			}
 		case video.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -154,6 +168,8 @@ func (v *Video) String() string {
 	builder.WriteString(v.Proxy)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", v.Status))
+	builder.WriteString(", streams=")
+	builder.WriteString(fmt.Sprintf("%v", v.Streams))
 	builder.WriteString(", created_at=")
 	builder.WriteString(v.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updated_at=")

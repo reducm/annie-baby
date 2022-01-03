@@ -27,11 +27,11 @@ func init() {
 	// video.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	video.TitleValidator = videoDescTitle.Validators[0].(func(string) error)
 	// videoDescCreatedAt is the schema descriptor for created_at field.
-	videoDescCreatedAt := videoFields[6].Descriptor()
+	videoDescCreatedAt := videoFields[7].Descriptor()
 	// video.DefaultCreatedAt holds the default value on creation for the created_at field.
 	video.DefaultCreatedAt = videoDescCreatedAt.Default.(func() time.Time)
 	// videoDescUpdatedAt is the schema descriptor for updated_at field.
-	videoDescUpdatedAt := videoFields[7].Descriptor()
+	videoDescUpdatedAt := videoFields[8].Descriptor()
 	// video.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	video.DefaultUpdatedAt = videoDescUpdatedAt.Default.(func() time.Time)
 	// video.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -24,6 +24,8 @@ const (
 	FieldProxy = "proxy"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldStreams holds the string denoting the streams field in the database.
+	FieldStreams = "streams"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -41,6 +43,7 @@ var Columns = []string{
 	FieldOutputDir,
 	FieldProxy,
 	FieldStatus,
+	FieldStreams,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -73,9 +76,16 @@ var (
 // Status defines the type for the "status" enum field.
 type Status string
 
+// StatusPENDING is the default value of the Status enum.
+const DefaultStatus = StatusPENDING
+
 // Status values.
 const (
-	StatusPENDING Status = "PENDING"
+	StatusCRAWSUCC Status = "CRAWSUCC"
+	StatusPENDING  Status = "PENDING"
+	StatusINFO     Status = "INFO"
+	StatusCRAWLING Status = "CRAWLING"
+	StatusCRAWFAIL Status = "CRAWFAIL"
 )
 
 func (s Status) String() string {
@@ -85,7 +95,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPENDING:
+	case StatusCRAWSUCC, StatusPENDING, StatusINFO, StatusCRAWLING, StatusCRAWFAIL:
 		return nil
 	default:
 		return fmt.Errorf("video: invalid enum value for status field: %q", s)
